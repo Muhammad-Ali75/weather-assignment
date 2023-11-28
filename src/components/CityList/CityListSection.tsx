@@ -3,6 +3,7 @@ import CityTile from "./CityTile";
 import { City } from "../../interface/city";
 import useCityStore from "../../store/citiesStore";
 import citiesList from "cities.json";
+import { useMemo } from "react";
 
 export default function CitiesSection() {
   const cities = useCityStore((state) => state.citiesList);
@@ -29,7 +30,7 @@ export default function CitiesSection() {
     } else return cities;
   }
 
-  const filteredCities = filterCities();
+  const filteredCities = useMemo(filterCities, [filterValue, cities]);
 
   const ListContainer = styled.div`
     display: flex;
@@ -43,19 +44,9 @@ export default function CitiesSection() {
 
   return (
     <ListContainer>
-      {filteredCities
-        .filter((item) => {
-          if (!filterValue) return true;
-          if (
-            item.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-            item.name.includes(filterValue)
-          ) {
-            return true;
-          }
-        })
-        .map((city: City, i: number) => (
-          <CityTile key={i} {...city} />
-        ))}
+      {filteredCities.map((city: City, i: number) => (
+        <CityTile key={i} {...city} />
+      ))}
     </ListContainer>
   );
 }
